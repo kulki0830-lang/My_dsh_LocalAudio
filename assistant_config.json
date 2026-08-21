@@ -1,0 +1,59 @@
+{
+  "llm": {
+    "mode": "deepseek",
+    "provider": "DeepSeek",
+    "base_url": "https://api.deepseek.com",
+    "api_key": "",
+    "model": "deepseek-chat",
+    "temperature": 0.8,
+    "max_tokens": 120,
+    "system_prompt": "你是装在用户电脑上的中文语音助手。用口语化、简短的方式回答（一般不超过3句话），不要使用markdown符号，不要长篇大论。",
+    "dsh_cli": "D:/.Apps/deepseek-harness/apps/cli/lib/bin.js",
+    "dsh_profile": "headless",
+    "dsh_workspace": "D:/.Apps/audiocpp",
+    "dsh_timeout_sec": 600,
+    "fallback_to_deepseek": true
+  },
+  "runtime": {
+    "asr_model": "sense-asr",
+    "tts_model": "qwen3-tts-06b-base",
+    "sentence_tts": true,
+    "max_sentence_len": 80,
+    "keep_tags": false
+  },
+  "audio_cpp": {
+    "server_url": "http://127.0.0.1:8081",
+    "asr_model": "qwen3-asr",
+    "asr_language": "zh",
+    "tts_model": "qwen3-tts",
+    "tts_language": "chinese",
+    "tts_options": {
+      "speaker": "Vivian"
+    },
+    "voice_ref": "D:/.Apps/audiocpp/LocalAudio_CLI/reference/voice.wav",
+    "reference_text": "@reference/voicetext.txt"
+  },
+  "audio": {
+    "input_device": null,
+    "output_device": null,
+    "sample_rate": 16000,
+    "max_record_seconds": 60,
+    "min_record_seconds": 0.6,
+    "silence_seconds": 1.0,
+    "silence_threshold": 0.01
+  },
+  "cloud_tts": {
+    "enabled": false,
+    "provider": "fish",
+    "base_url": "https://api.fish.audio",
+    "api_key": "",
+    "openrouter_api_key": "",
+    "model": "s2.1-pro-free",
+    "response_format": "mp3",
+    "voice_id": "",
+    "latency": "balanced"
+  },
+  "memory": {
+    "max_turns": 10
+  }
+}
