@@ -182,6 +182,17 @@
 > **給下一位開發者的建議：**
 > 沙箱限制出現時先判斷是否「文件化邊界」——是的話改架構(把測試模式內建到被測物)，不要繞路或反覆重試。
 
+### 3.9 「ASCII 副本」目錄本身落在非 ASCII 路徑下
+
+* **原本想做什麼：** audio.cpp 對含非 ASCII 字元的 `voice_ref` **路徑**回 HTTP 500「No mapping for the Unicode character exists in the target multi-byte code page」(Win32 ERROR_NO_UNICODE_TRANSLATION),故 bridge 把 wav 複製到副本目錄再送出。
+* **採用的方法：** 副本固定放在 `BASE/ascii-refs`(`BASE`=bridge 所在工作區目錄)。
+* **實際結果：** 參考音檔原放在純 ASCII 的 `D:/.Apps/audiocpp/...` 時一切正常(路徑本來就 ASCII,根本不走副本)；使用者把參考檔搬進**中文工作區**後，每個克隆 TTS 請求必 500——副本的上層目錄全是中文，「ASCII 副本」名不符實。
+* **問題原因：** 防禦機制只檢查了「來源路徑是否需要複製」，沒有保證「副本目的地的完整路徑」是 ASCII;且錯誤訊息指向碼頁轉換，誘導先去懷疑文字內容(emoji/簡體字)，繞了遠路。
+* **最後採用的方式：** `_ensure_ascii_dir()` 惰性選定副本目錄——優先 `<server exe 根>/output/ascii-refs`(audiocpp 樹為純 ASCII),退回系統暫存目錄；候選整條路徑必須 ASCII 才採用。實測中文來源 → ASCII 副本 → 200。
+
+> **給下一位開發者的建議：**
+> 「轉換/淨化」類防禦必須對**輸出的完整路徑**做斷言，而不是只處理輸入；搬移被引用的資料檔是防禦失效的常見觸發點。除錯時先用二分法隔離欄位(path vs input vs reference_text 各自替換成安全值)，不要被錯誤訊息的字面意思帶著走——本次文字內容(含 Big5 缺字的簡體字)實證無害，唯一觸發點是路徑。
+
 ---
 
 ## 4. 除錯經驗

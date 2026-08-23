@@ -36,6 +36,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import wave
@@ -51,7 +52,10 @@ for _s in (sys.stdout, sys.stderr, sys.stdin):
         pass
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-ASCII_DIR = os.path.join(BASE, "ascii-refs")
+# 副本目錄不可位於含非 ASCII 字元的路徑下（例如工作區中文目錄），
+# 否則 audio.cpp 轉換 voice_ref 路徑時回 500「No mapping for the Unicode character...」。
+# 實際目錄由 _ensure_ascii_dir() 惰性決定。
+ASCII_DIR = ""
 SERVER_URL = "http://127.0.0.1:8081"
 CREATE_NO_WINDOW = 0x08000000
 
@@ -86,14 +90,41 @@ def pick_device(kind, wanted):
     return sd.default.device[idx] if sd.default.device[idx] is not None else 0
 
 
+def _ensure_ascii_dir():
+    """挑選並建立『整條路徑皆為 ASCII』的副本目錄，回傳其路徑；全敗則回空字串。
+
+    優先 <server exe 根目錄>/output/ascii-refs（audiocpp 樹本身為純 ASCII），
+    退回系統暫存目錄。"""
+    global ASCII_DIR
+    if ASCII_DIR:
+        return ASCII_DIR
+    cands = []
+    exe = ((CFG.get("server") or {}).get("exe")) or ""
+    if exe:
+        cands.append(os.path.join(os.path.dirname(os.path.dirname(exe)), "output", "ascii-refs"))
+    cands.append(tempfile.gettempdir())
+    for cand in cands:
+        if not cand or any(ord(ch) > 127 for ch in os.path.abspath(cand)):
+            continue
+        try:
+            os.makedirs(cand, exist_ok=True)
+            ASCII_DIR = cand
+            return ASCII_DIR
+        except Exception:
+            continue
+    return ""
+
+
 def resolve_voice_path(path):
-    """audio.cpp 不吃非 ASCII 路徑：需要時複製一份 ASCII 副本並回傳副本路徑。"""
+    """audio.cpp 不吃含非 ASCII 字元的路徑：需要時複製一份到純 ASCII 目錄。"""
     if not path:
         return ""
     if all(ord(ch) < 128 for ch in path):
         return path
-    os.makedirs(ASCII_DIR, exist_ok=True)
-    dst = os.path.join(ASCII_DIR, "voice_ref_%d.wav" % int(time.time() * 1000))
+    dst_dir = _ensure_ascii_dir()
+    if not dst_dir:
+        return path
+    dst = os.path.join(dst_dir, "voice_ref_%d.wav" % int(time.time() * 1000))
     shutil.copy2(path, dst)
     return dst
 

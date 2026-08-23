@@ -12,7 +12,8 @@
 | pkg-6 | 鍵名正規化 | camelCase→snake_case alias 修復克隆 TTS 500 與啟動空路徑 WinError 3;點色 CSS hex fallback;TTS 錯誤帶回應內文 | ✅ 使用者確認克隆可用 |
 | pkg-7 | 順序與預熱 | 播放 seq 順序鎖修亂序;失敗哨兵跳句;收音期預熱模型;切分器升級(Markdown 清洗/軟切點/雜訊過濾) | ✅ 順序確認;TTFT 仍 20–60s |
 | pkg-8 | 真串流管線 | 改聽 `assistant/chunk` text-delta 邊生成邊逐句派發(不等 turn/end);靜音判定 0.8s;移除播報前阻塞往返 | ✅ TTFT 最短 ~3s |
-| **pkg-9** | **上限解除(現行)** | **maxTtsChars 0=不限(原 500 造成長文 503 字斷音);播放看門狗 5→15 分** | ✅ **驗收通過=本基線** |
+| **pkg-9** | **上限解除** | **maxTtsChars 0=不限(原 500 造成長文 503 字斷音);播放看門狗 5→15 分** | ✅ 驗收通過=dynamic-baseline-v1.0 |
+| **pkg-10** | **bridge 重載(現行)** | **Host/Client 不變;重載 bridge 套用修復:ASCII 副本目錄改至純 ASCII 路徑(audiocpp/output 或系統暫存)**——參考檔搬入中文工作區後克隆 TTS 全 500 的根因 | ✅ 使用者實測恢復正常 |
 
 ## 重建 current
 
