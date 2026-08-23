@@ -69,8 +69,9 @@ Invoke-WebRequest http://127.0.0.1:3080/api/dsh-voice/state     # 路由活著
 ### ⑥ 長文本「順序混亂」(雙 bug 疊加)
 - **症狀 A(致命)**:>80 字段落一出現,該批後續句子全部消失,播放跳段。
   - 根因:`segToSentences` 用 `const` 宣告卻在迴圈重新賦值 → TypeError → 被外層 try/catch 吞掉。短文本永不觸發,故此前未現形。
+  - **歸屬:移植期引入**——動態源碼用的是 `var`(可重賦值),無此問題。
 - **症狀 B(體感)**:`neighbo|rs`、`biol|uminescent` 單字腰斬。
-  - 根因:軟切點找不到逗號時硬切在第 N 字元(動態版同源演算法既有缺陷,中文標點密所以從未暴露)。
+  - 根因:軟切點找不到逗號時硬切在第 N 字元(**動態版同源演算法既有缺陷**,中文標點密所以從未暴露)。
 - **修法**:`let` + 軟切後備退到最後一個空白;以「切出的句子拼回原文逐詞比對一致」作為驗證標準。
 - **教訓**:**吞錯的 catch 是沉默殺手**——長文本測試是必需項;驗證切分用「詞流還原一致性」而非肉眼。
 
@@ -104,8 +105,16 @@ Invoke-WebRequest http://127.0.0.1:3080/api/dsh-voice/state     # 路由活著
 |---|---|---|---|
 | 串流 TTS 模型 | `HTTP 500: VoxCPM2 streaming generation requires retry_badcase=false` | audiocpp 該模型需旗標 | bridge 送 start-server 時帶模型相容旗標 |
 | doctor `/status` 404 | 第三方 doctor 面板輪詢不存在的路由 | 該面板預期的路由不存在 | 無害噪音,忽略 |
-| 句點後小寫不切 | `one two. three` 不斷句 | 防檔名 `file.txt` 誤傷的取捨 | 可加白名喬木 |
+| 句點後小寫不切 | `one two. three` 不斷句 | 防檔名 `file.txt` 誤傷的取捨 | 可加白名單 |
 | URL 內 `?` 會切句 | 含 query string 的網址被斷 | `?` 是強標點 | 前後文判斷 |
+
+### 回修記錄(動態源碼同步)
+
+永久化過程發現的**同源演算法缺陷**已回修到動態版參照源碼 `plugin/voice-1/pkg-9.host.js`(2026-08-23):
+1. 英文句點分句規則 + 縮寫程式碼過濾(§三⑦)
+2. 軟切點空白後備,永不腰斬單字(§三⑥-B)
+
+驗證方式與永久版相同:抽取宿主真實函式、以用戶長文本跑詞流還原比對,18 段全落詞邊界、輸出與永久版逐字一致。`Development` 分支凍結線(`dynamic-baseline-v1.0`)不動——回修只落在 `release` 分支的參照副本上。注意:`pkg-9.host.js` 是函式體檔(cordis_define 直接 eval),語法驗證要用 `new Function(body)` 而非 `node --check`。
 
 ## 六、流程經驗(與人與工具)
 

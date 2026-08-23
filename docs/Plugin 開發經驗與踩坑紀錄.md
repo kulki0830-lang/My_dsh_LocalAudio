@@ -1,5 +1,7 @@
 # Plugin 開發經驗與踩坑紀錄
 
+> **姊妹文件**：永久化移植（dsh-voice）專項的踩坑與部署 SOP 見 [`permanent/PORTING-NOTES.md`](../permanent/PORTING-NOTES.md)——兩份互補，動態+永久一起讀才是全貌。
+
 > **本文件目的：**
 > 將本次 Plugin 實際開發、除錯、驗收過程中的可複用經驗、錯誤嘗試與重要注意事項整理出來。
 > **本文件不是開發紀錄，也不是下一階段 PLAN。**

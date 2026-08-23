@@ -230,6 +230,11 @@ return {
         for (var i = head.length - 1; i >= Math.floor(maxLen * 0.4); i--) {
           if ('，,、：:'.indexOf(head[i]) >= 0) { cut = i + 1; break }
         }
+        // Fall back to the last space so English words are never split in half.
+        if (cut <= 0) {
+          var sp = head.lastIndexOf(' ')
+          if (sp >= Math.floor(maxLen * 0.4)) cut = sp
+        }
         if (cut <= 0) cut = maxLen
         parts.push(seg.slice(0, cut).trim())
         seg = seg.slice(cut).trim()
@@ -316,16 +321,33 @@ return {
       if (sentAny) beginSpeaking(r)
       return sentAny
     }
+    // English period counts as a boundary only when it ends a word and is
+    // followed by whitespace + a new sentence start; abbreviation false
+    // positives are filtered in code (see ABBREV below). Mirrors the fix
+    // first shipped in permanent/dsh-voice (PORTING-NOTES §三⑦).
+    var SENT_RE = /[。！？!?；;\n]|(?<=[A-Za-z0-9)\]"”’])\.(?=[ \t]+["'“(\[]?[A-Z0-9])/g
+    var ABBREV = { Mr: 1, Mrs: 1, Ms: 1, Dr: 1, Prof: 1, St: 1, Sr: 1, Jr: 1, vs: 1, etc: 1, approx: 1 }
+    function isAbbrevBoundary(beforeText) {
+      var wm = /[A-Za-z]+$/.exec(beforeText)
+      if (wm && ABBREV[wm[0]]) return true
+      return /(?:^|[\s("“])(?:e\.g|i\.e)$/i.test(beforeText)
+    }
     function feedStream(r) {
       if (r.suppressTts) return
       var maxLen = state.settings.maxSentenceLen || 80
       var sentAny = false
+      var scan = r.pos
       while (true) {
-        var m = /[。！？!?；;\n]/.exec(r.raw.slice(r.pos))
+        var rest = r.raw.slice(scan)
+        SENT_RE.lastIndex = 0
+        var m = SENT_RE.exec(rest)
         if (!m) break
-        var end = r.pos + m.index + 1
+        var abs = scan + m.index
+        if (m[0] === '.' && isAbbrevBoundary(r.raw.slice(r.pos, abs))) { scan = abs + 1; continue }
+        var end = abs + m[0].length
         var seg = r.raw.slice(r.pos, end)
         r.pos = end
+        scan = r.pos
         sentAny = dispatchSentences(r, segToSentences(seg, maxLen)) || sentAny
       }
       return sentAny
