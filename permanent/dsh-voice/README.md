@@ -12,7 +12,25 @@
 | `cordis.patch.yml` | 插頁:一行 `- insert: - id: voice / name: 'dsh-voice'` |
 
 **離線驗證已過**:宿主(node --check + import + Config 預設值)、客端(node --check + CSS 完整搬運)。
-**未驗證**:真實掛載(需安裝+重啟)。安裝後動態 voice-1 將隨重啟消失,永久版按鈕/設定頁直接接手。
+**未驗證**:真實掛載(需重啟)。安裝後動態 voice-1 將隨重啟消失,永久版按鈕/設定頁直接接手。
+
+## 本機部署紀錄(2026-08-23)
+
+已安裝至 `~/.dsh/profiles/web/`(待命,重啟生效):
+
+1. 套件複製:`node_modules/dsh-voice/`(robocopy /MIR /XD node_modules)
+2. `package.json` → `dsh.profile.bundles` 陣列尾端加入 `"dsh-voice"`
+
+回滾:反向兩步(bundles 移除該行 + 刪 node_modules/dsh-voice)+ 重啟。
+驗收清單見 [`../ACCEPTANCE-P6.md`](../ACCEPTANCE-P6.md)。
+
+### 計畫偏離紀錄
+
+- **P5(設定遷移)以設計偏離滿足**:Config `settingsFile` 預設直指原
+  `runtime/voice-settings.json`,舊設定零遷移自動續用;Settings namespace
+  化列為日後 polish,非必要。
+- **P4(PID 檔清理)**:v8 bridge 從不寫 PID 檔(記憶體追蹤+netstat 後備),
+  遺留項不存在,無事可清。
 
 ## 安裝(P1 驗證用)
 
