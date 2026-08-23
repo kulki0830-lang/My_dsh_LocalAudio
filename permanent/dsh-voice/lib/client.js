@@ -30,10 +30,22 @@ window.__ModuleLoader__.load({
 			toggle: '/api/dsh-voice/toggle',
 		}
 		var HTTP = { state: 'GET', config: 'GET', toggle: 'POST', setService: 'POST', setModel: 'POST', savePreset: 'POST', selectPreset: 'POST', deletePreset: 'DELETE' }
+		/** RPC action name → API key (action names and route paths intentionally differ). */
+		var PATH_OF = {
+			state: 'state',
+			config: 'config',
+			toggle: 'toggle',
+			setService: 'service',
+			setModel: 'model',
+			savePreset: 'presets',
+			deletePreset: 'presets',
+			selectPreset: 'presetSelect',
+		}
 
 		function call(rpc, args) {
 			var verb = HTTP[rpc] || 'POST'
-			var url = API[rpc === 'selectPreset' ? 'presetSelect' : rpc]
+			var url = API[PATH_OF[rpc]]
+			if (!url) return Promise.reject(new Error('未知的語音動作: ' + rpc))
 			if (verb === 'GET') url += '?t=' + Date.now()
 			var init = { method: verb, headers: {} }
 			if (verb !== 'GET') {
@@ -103,7 +115,10 @@ window.__ModuleLoader__.load({
 						showToast('error', msg)
 					}
 					return res
-				}).catch(function () { return undefined })
+				}).catch(function (e) {
+					showToast('error', (e && e.message) || '連線失敗')
+					return undefined
+				})
 			}
 			function poll() {
 				call('state').then(function (s) {
