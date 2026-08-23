@@ -1,7 +1,8 @@
 /*!
  * voice-1 / pkg-9 Client half — Dynamic Development Baseline (dynamic-baseline-v1.0)
  *
- * 來源：DSH 動態插件 voice-1 之 currentPackageId pkg-9（已驗收；自 pkg-6 起內容未變）。
+ * 來源：DSH 動態插件 voice-1（自 pkg-6 起內容未變）。**現行 current 為 pkg-10,其 Client
+ * 內容與本檔完全相同**（pkg-10 僅為重載 bridge 而定義,見 PACKAGES.md）。
  * 沙箱限制：僅 React.createElement / useState / useEffect 可用（無 useRef、無全域 setTimeout）；
  *           計時一律 ctx.timer.*（inject ['timer']）；樣式以 styles.insert 注入。
  */

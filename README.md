@@ -34,9 +34,9 @@ My_dsh_LocalAudio/
 │   ├── 即時語音-動態插件驗收紀錄.md      （驗收結果+架構圖+版本沿革）
 │   └── Plugin 開發經驗與踩坑紀錄.md      （可複用經驗/錯誤嘗試/除錯方法論）
 ├── plugin/voice-1/              Dynamic Plugin
-│   ├── pkg-9.host.js            （最終版 Host 半，函式主體，可直接重新 cordis_define）
-│   ├── pkg-9.client.js          （最終版 Client 半）
-│   └── PACKAGES.md              （pkg-1..9 版本軌跡）
+│   ├── pkg-9.host.js            （Host 半源碼;現行 pkg-10 內容相同,見 PACKAGES.md）
+│   ├── pkg-9.client.js          （Client 半源碼;現行 pkg-10 內容相同）
+│   └── PACKAGES.md              （pkg-1..10 版本軌跡與重建規則）
 ├── runtime/                     Runtime / Bridge
 │   ├── voice_bridge.py          （常駐橋接：8081 管理/ASR 收音/有序播放/--selftest）
 │   └── voice-settings.example.json（設定範本；實際檔屬個人本機狀態，不入庫）
@@ -49,7 +49,7 @@ My_dsh_LocalAudio/
 前置依賴與逐步操作見 [`development/ENVIRONMENT.md`](development/ENVIRONMENT.md)。摘要：
 
 1. 就位外部依賴：audiocpp server（含模型）、venv python（numpy/sounddevice/requests）、路徑與 `plugin/voice-1/pkg-9.host.js` 頂部常數對齊。
-2. 在 DSH 中以 pkg-9 host/client 源碼 `cordis_define`（existing → voice-1）並核准 run。
+2. 在 DSH 中以該 host/client 源碼 `cordis_define`（existing → voice-1）並核准 run（current=pkg-10,源碼同 pkg-9）。
 3. 設定頁按「執行」啟動 8081；點通訊圓鈕開始語音對話。
 4. 診斷：呼叫 `voice_selftest` Tool，或 `python voice_bridge.py --selftest`。
 

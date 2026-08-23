@@ -1,7 +1,8 @@
 /*!
  * voice-1 / pkg-9 Host half — Dynamic Development Baseline (dynamic-baseline-v1.0)
  *
- * 來源：DSH 動態插件 voice-1 之 currentPackageId pkg-9（已驗收）。
+ * 來源：DSH 動態插件 voice-1。**現行 current 為 pkg-10,其 Host 內容與本檔完全相同**
+ * （pkg-10 僅為重載 bridge 而定義,代碼零變更,見 PACKAGES.md）。
  * 重新部署方式（不修改內容，僅按環境調整頂部路徑常數 WS/AUDIOCPP/CURL）：
  *   cordis_define({ kind:'existing', pluginId:'voice-1' }, name, purpose,
  *                 { host: <本檔全文>, client: <pkg-9.client.js 全文> })

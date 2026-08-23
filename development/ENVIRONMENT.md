@@ -12,7 +12,7 @@
 | 克隆參考檔(選用) | voice.wav + 逐字文本 voicetext.txt | 任意本機路徑;於設定頁保存為預設 |
 
 路徑全部集中定義在 [`plugin/voice-1/pkg-9.host.js`](../plugin/voice-1/pkg-9.host.js) 頂部常數
-(`WS/RUNTIME/PY/BRIDGE/AUDIOCPP/SERVER_URL/CURL`)——換環境先改這裡。
+（`WS/RUNTIME/PY/BRIDGE/AUDIOCPP/SERVER_URL/CURL`;現行 pkg-10 源碼與此檔相同）——換環境先改這裡。
 
 ## 2. 部署動態插件
 

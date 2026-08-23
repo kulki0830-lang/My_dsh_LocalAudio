@@ -17,8 +17,12 @@
 
 ## 重建 current
 
-`pkg-9.host.js` + `pkg-9.client.js` 即完整內容(函式主體形式)。
+**current = pkg-10;其 Host/Client 源碼與 pkg-9 完全相同**——pkg-10 僅為「套用 bridge 修復後重載橋接程序」而定義(bridge 由插件 spawn,改了 `voice_bridge.py` 必須追加新 Package 重跑插件才會生效),代碼零變更。
+因此本目錄的 `pkg-9.host.js` + `pkg-9.client.js` 即現行完整源碼(函式主體形式)。
+
 重新部署:`cordis_define(kind:'existing', pluginId:'voice-1', code:{host:<host 檔全文>, client:<client 檔全文>})` → `cordis_run(mode:'update' 或 'run')`,首次需 GUI 核准。
+
+> **規則**：只有 Host/Client 代碼變更才需要新的 js 檔；bridge 變更只需追加同源碼的新 Package 觸發重載。
 
 ## 歷史教訓索引
 
