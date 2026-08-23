@@ -1,0 +1,9 @@
+# dsh-voice bundle patch: inserts the plugin row into the profile roster.
+# Applied as a profile bundle layer (the `dsh.bundle.patch` manifest field);
+# activate with `dsh plugin --profile <name> add <path-to-dsh-voice>`.
+#
+# P1 scope: HOST HALF ONLY — package.json intentionally omits `dsh.client`,
+# so the browser loads nothing until P3 lands the client half.
+- insert:
+    - id: voice
+      name: 'dsh-voice'
