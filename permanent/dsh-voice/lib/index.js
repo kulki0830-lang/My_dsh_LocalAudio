@@ -27,18 +27,18 @@ const inject = ['webServer', 'subprocess', 'timer', 'fs', 'tools']
  * dynamic plugin on this machine.
  */
 const Config = schema.object({
-  audioCppExe: schema.string().default('D:/Apps/audiocpp/bin/audiocpp_server.exe'),
-  audioCppCfg: schema.string().default('D:/Apps/audiocpp/server.json'),
-  audioCppBinDir: schema.string().default('D:/Apps/audiocpp/bin'),
-  apiServerLog: schema.string().default('D:/Apps/audiocpp/output/api_server.log'),
-  apiServerErrLog: schema.string().default('D:/Apps/audiocpp/output/api_server.err.log'),
+  audioCppExe: schema.string().default('D:/.Apps/audiocpp/bin/audiocpp_server.exe'),
+  audioCppCfg: schema.string().default('D:/.Apps/audiocpp/server.json'),
+  audioCppBinDir: schema.string().default('D:/.Apps/audiocpp/bin'),
+  apiServerLog: schema.string().default('D:/.Apps/audiocpp/output/api_server.log'),
+  apiServerErrLog: schema.string().default('D:/.Apps/audiocpp/output/api_server.err.log'),
   serverPort: schema.number().default(8081),
   curlExe: schema.string().default('C:/Windows/System32/curl.exe'),
-  pythonExe: schema.string().default('D:/Apps/deepseek-harness/deepseek 工作區/研究與架構/及時語音互動/LocalAudio_CLI/.assistant-venv/Scripts/python.exe'),
+  pythonExe: schema.string().default('D:/.Apps/deepseek-harness/deepseek 工作區/研究與架構/及時語音互動/LocalAudio_CLI/.assistant-venv/Scripts/python.exe'),
   // '' = package assets/voice_bridge.py (resolved relative to this module)
   bridgeScript: schema.string().default(''),
   // Legacy user-settings file carried over from the dynamic plugin era.
-  settingsFile: schema.string().default('D:/Apps/deepseek-harness/deepseek 工作區/研究與架構/及時語音互動/dsh_LocalAudio/runtime/voice-settings.json'),
+  settingsFile: schema.string().default('D:/.Apps/deepseek-harness/deepseek 工作區/研究與架構/及時語音互動/dsh_LocalAudio/runtime/voice-settings.json'),
   silenceSeconds: schema.number().default(0.8),
   silenceThreshold: schema.number().default(0.01),
   sampleRate: schema.number().default(16000),
@@ -177,11 +177,11 @@ function apply(ctx, config) {
     const bridge = field('bridgeScript', '') ||
       fileURLToPath(new URL('../assets/voice_bridge.py', import.meta.url))
     return {
-      audioCppExe: field('audioCppExe', 'D:/Apps/audiocpp/bin/audiocpp_server.exe').replace(/\\/g, '/'),
-      audioCppCfg: field('audioCppCfg', 'D:/Apps/audiocpp/server.json').replace(/\\/g, '/'),
-      audioCppBinDir: field('audioCppBinDir', 'D:/Apps/audiocpp/bin').replace(/\\/g, '/'),
-      apiServerLog: field('apiServerLog', 'D:/Apps/audiocpp/output/api_server.log').replace(/\\/g, '/'),
-      apiServerErrLog: field('apiServerErrLog', 'D:/Apps/audiocpp/output/api_server.err.log').replace(/\\/g, '/'),
+      audioCppExe: field('audioCppExe', 'D:/.Apps/audiocpp/bin/audiocpp_server.exe').replace(/\\/g, '/'),
+      audioCppCfg: field('audioCppCfg', 'D:/.Apps/audiocpp/server.json').replace(/\\/g, '/'),
+      audioCppBinDir: field('audioCppBinDir', 'D:/.Apps/audiocpp/bin').replace(/\\/g, '/'),
+      apiServerLog: field('apiServerLog', 'D:/.Apps/audiocpp/output/api_server.log').replace(/\\/g, '/'),
+      apiServerErrLog: field('apiServerErrLog', 'D:/.Apps/audiocpp/output/api_server.err.log').replace(/\\/g, '/'),
       serverPort: field('serverPort', 8081),
       curlExe: field('curlExe', 'C:/Windows/System32/curl.exe'),
       pythonExe: field('pythonExe', '').replace(/\\/g, '/'),
