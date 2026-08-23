@@ -1,0 +1,10 @@
+# dsh-voice bundle patch: inserts the plugin row into the profile roster.
+# Applied as a profile bundle layer (the `dsh.bundle.patch` manifest field);
+# activate with `dsh plugin --profile <name> add <path-to-dsh-voice>`.
+#
+# P3 scope: dual-face. package.json declares exports["./client"] +
+# `dsh.client` (platform web, external react), so the browser half loads at
+# /plugins/dsh-voice/client.js alongside the host half.
+- insert:
+    - id: voice
+      name: 'dsh-voice'

@@ -1,0 +1,33 @@
+{
+  "_comment": "voice-settings.json 範本。複製為 runtime 同層實際檔(路徑依環境調整);實際檔含本機絕對路徑,已被 .gitignore 排除。",
+  "asrModel": "sense-asr",
+  "ttsModel": "qwen3-tts-06b-base",
+  "presets": [
+    {
+      "id": "p<timestamp>",
+      "voice": {
+        "id": "v<timestamp>",
+        "label": "voice.wav",
+        "path": "<絕對路徑>/reference/voice.wav"
+      },
+      "text": {
+        "id": "t<timestamp>",
+        "label": "voicetext.txt",
+        "path": "<絕對路徑>/reference/voicetext.txt"
+      }
+    }
+  ],
+  "activePresetId": null,
+  "voicePrefix": "(Voice) ",
+  "maxTtsChars": 0,
+  "maxSentenceLen": 80,
+  "_欄位說明": {
+    "asrModel": "ASR 模型 id(sense-asr / qwen3-asr)",
+    "ttsModel": "TTS 模型 id;qwen3-*-base* 家族需要克隆預設",
+    "presets": "克隆音色預設:wav 路徑 + 與音檔逐字一致的 UTF-8 文本路徑",
+    "activePresetId": "使用中的預設 id;null = 內建音色 Vivian",
+    "voicePrefix": "注入對話的語音訊息前綴",
+    "maxTtsChars": "單輪朗讀字元上限;0 = 不限制",
+    "maxSentenceLen": "單句最大長度(超過在軟切點切分)"
+  }
+}

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Node(本地煙霧測試用的依賴鏡像;安裝後由 profile 樹解析)
+node_modules/
+
+# 執行期產物
+runtime/ascii-refs/
+runtime/voice-settings.json
+*.log
+output/
+
+# 系統/編輯器
+.DS_Store
+Thumbs.db
