@@ -116,6 +116,10 @@ Invoke-WebRequest http://127.0.0.1:3080/api/dsh-voice/state     # 路由活著
 
 驗證方式與永久版相同:抽取宿主真實函式、以用戶長文本跑詞流還原比對,18 段全落詞邊界、輸出與永久版逐字一致。`Development` 分支凍結線(`dynamic-baseline-v1.0`)不動——回修只落在 `release` 分支的參照副本上。注意:`pkg-9.host.js` 是函式體檔(cordis_define 直接 eval),語法驗證要用 `new Function(body)` 而非 `node --check`。
 
+### 發佈狀態:刻意維持本機包
+
+`package.json` 帶 `"private": true`(npm 會拒絕 publish),且本 DSH 部署無 `plugin add` CLI。**不做 npm 發佈是決策不是疏漏**,原因=依賴鏈帶不走:`audiocpp_server.exe`(本地二進位)、Python venv、用戶自有模型/音色檔。分發形式=GitHub 原始碼 + 本文件自架 SOP。若未來要發佈:改 scoped 名(`@<user>/dsh-voice`)、移除 private、defaults 全參數化、補環境架設章節——但 audiocpp 仍需每位用戶自行取得。
+
 ## 六、流程經驗(與人與工具)
 
 - **Git**:沙箱下每次 pwsh 只跑**一條** git 命令(連發會 Access denied);push 需要 `danger-full-access` 提權一次完成。
