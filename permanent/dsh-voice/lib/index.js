@@ -130,6 +130,34 @@ function jsonRoute(path, method, logic) {
   }
 }
 
+/** Same guard as jsonRoute(), but dispatches to a different logic() per HTTP method
+ *  under ONE registered route — needed because webServer.register() dedupes purely
+ *  by `path`, so two jsonRoute() calls with the same path (different methods) collide. */
+function jsonRouteMulti(path, handlers) {
+  return {
+    kind: 'exact',
+    path,
+    handler: async (req, res) => {
+      if (!isLoopbackRequest(req)) {
+        writeJson(res, 403, { ok: false, error: 'forbidden: loopback-only' })
+        return
+      }
+      const logic = handlers[req.method]
+      if (!logic) {
+        writeJson(res, 405, { ok: false, error: `method not allowed: ${req.method}` })
+        return
+      }
+      try {
+        const args = req.method === 'GET' ? {} : ((await readJsonBody(req)) ?? {})
+        const result = await logic(args)
+        writeJson(res, 200, result ?? { ok: true })
+      } catch (error) {
+        writeJson(res, 500, { ok: false, error: (error && error.message) || String(error) })
+      }
+    },
+  }
+}
+
 /**
  * Mount the full voice host surface.
  * @param ctx - host plugin context carrying webServer/subprocess/timer/fs/tools.
@@ -696,32 +724,34 @@ function apply(ctx, config) {
       if (state.bridge) sendConfig()
       return { ok: true, settings: pubSettings() }
     }),
-    jsonRoute(API.presets, 'POST', async (a) => {
-      const vp = String((a && a.voicePath) || '').trim()
-      const tp = String((a && a.textPath) || '').trim()
-      if (!vp || !tp) return { ok: false, error: '音檔與文本路徑皆為必填' }
-      try { const vs = await fs.stat(await fs.resolve(vp)); if (!vs) throw new Error('not found') } catch (e) { return { ok: false, error: '音檔不可讀: ' + vp } }
-      let ref = ''
-      try { ref = (await fs.readText(await fs.resolve(tp))).trim() } catch (e) { return { ok: false, error: '文本檔不可讀: ' + tp } }
-      if (!ref) return { ok: false, error: '文本內容為空白（UTF-8）' }
-      const baseName = (p) => { const parts = p.split(/[\\/]/); return parts[parts.length - 1] || p }
-      const ts = Date.now()
-      const pair = { id: 'p' + ts, voice: { id: 'v' + ts, label: baseName(vp), path: vp }, text: { id: 't' + ts, label: baseName(tp), path: tp } }
-      state.settings.presets.push(pair)
-      state.settings.activePresetId = pair.id
-      await persistSettings()
-      if (state.bridge) sendConfig()
-      return { ok: true, presets: state.settings.presets, activePresetId: pair.id }
-    }),
-    jsonRoute(API.presets, 'DELETE', async (a) => {
-      const pid = a && a.presetId
-      const before = state.settings.presets.length
-      state.settings.presets = state.settings.presets.filter((p) => p.id !== pid)
-      if (state.settings.presets.length === before) return { ok: false, error: '找不到預設' }
-      if (state.settings.activePresetId === pid) state.settings.activePresetId = null
-      await persistSettings()
-      if (state.bridge) sendConfig()
-      return { ok: true, presets: state.settings.presets, activePresetId: state.settings.activePresetId }
+    jsonRouteMulti(API.presets, {
+      POST: async (a) => {
+        const vp = String((a && a.voicePath) || '').trim()
+        const tp = String((a && a.textPath) || '').trim()
+        if (!vp || !tp) return { ok: false, error: '音檔與文本路徑皆為必填' }
+        try { const vs = await fs.stat(await fs.resolve(vp)); if (!vs) throw new Error('not found') } catch (e) { return { ok: false, error: '音檔不可讀: ' + vp } }
+        let ref = ''
+        try { ref = (await fs.readText(await fs.resolve(tp))).trim() } catch (e) { return { ok: false, error: '文本檔不可讀: ' + tp } }
+        if (!ref) return { ok: false, error: '文本內容為空白（UTF-8）' }
+        const baseName = (p) => { const parts = p.split(/[\\/]/); return parts[parts.length - 1] || p }
+        const ts = Date.now()
+        const pair = { id: 'p' + ts, voice: { id: 'v' + ts, label: baseName(vp), path: vp }, text: { id: 't' + ts, label: baseName(tp), path: tp } }
+        state.settings.presets.push(pair)
+        state.settings.activePresetId = pair.id
+        await persistSettings()
+        if (state.bridge) sendConfig()
+        return { ok: true, presets: state.settings.presets, activePresetId: pair.id }
+      },
+      DELETE: async (a) => {
+        const pid = a && a.presetId
+        const before = state.settings.presets.length
+        state.settings.presets = state.settings.presets.filter((p) => p.id !== pid)
+        if (state.settings.presets.length === before) return { ok: false, error: '找不到預設' }
+        if (state.settings.activePresetId === pid) state.settings.activePresetId = null
+        await persistSettings()
+        if (state.bridge) sendConfig()
+        return { ok: true, presets: state.settings.presets, activePresetId: state.settings.activePresetId }
+      },
     }),
     jsonRoute(API.presetSelect, 'POST', async (a) => {
       const pid = a && a.presetId
