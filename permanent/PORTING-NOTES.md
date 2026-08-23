@@ -123,5 +123,21 @@ Invoke-WebRequest http://127.0.0.1:3080/api/dsh-voice/state     # 路由活著
 - **每修必 commit**,訊息寫清「症狀+根因」,讓這份文件的每一條都能對應到一個 hash。
 - **驗收順序**:先核心功能(§15)→ 遷移完整性(設定/預設)→ 邊角(長文本/英文)→ 再談退役動態版。
 
+## 七、之後怎麼繼續開發新功能
+
+```
+feature/xxx(從 release 切出)
+   │  改 permanent/dsh-voice/lib/*.js
+   ▼
+robocopy 部署到 profile → 重啟 DSH → 實測
+   ▼ 滿意後合併回 release(隨時推 GitHub 備份)
+   ▼ 累積到穩定里程碑才 PR release→main + 打 tag
+```
+
+- **預設工作線是 `release`**,不是 main。main 只收里程碑快照,實驗代碼永不直進。
+- **永久版部署摩擦已與動態相當**(一次 robocopy+重啟),動態沙箱不再是必經之路。
+- **動態沙箱的剩餘價值=炸了不傷本體**:測可能弄崩啟動的東西(新路由、壞 import)時,丟一次性動態插件試錯;崩了重開 session 即可,`~/.dsh/profiles` 不受影響。
+- 改**宿主半**(lib/index.js)必須重啟;改**客端半**(lib/client.js)理論上走 bundle HMR,但保險起見一律重啟+Ctrl+F5 再判定。
+
 ---
-*最後更新:2026-08-23,對應 release 分支 `fa730e1`。*
+*最後更新:2026-08-23,對應 release 分支 `69adb4a`。*
