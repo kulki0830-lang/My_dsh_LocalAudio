@@ -1,4 +1,0 @@
-.env
-.assistant-venv/
-__pycache__/
-*.pyc
