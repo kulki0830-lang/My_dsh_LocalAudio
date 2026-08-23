@@ -500,16 +500,39 @@ function apply(ctx, config) {
     if (sentAny) beginSpeaking(r)
     return sentAny
   }
+  /**
+   * Sentence terminators. CJK strong marks as-is; an English period counts
+   * only when it ends a word (letter/digit/closer before it) and is followed
+   * by whitespace + a new sentence start (capital/digit/opening quote) — so
+   * decimals and URLs stay intact. Abbreviation false positives are filtered
+   * in code below (a plain set beats nested-lookbehind regexes).
+   */
+  const SENT_RE = /[。！？!?；;\n]|(?<=[A-Za-z0-9)\]"”’])\.(?=[ \t]+["'“(\[]?[A-Z0-9])/g
+  const ABBREV = new Set(['Mr', 'Mrs', 'Ms', 'Dr', 'Prof', 'St', 'Sr', 'Jr', 'vs', 'etc', 'approx'])
+  function isAbbrevBoundary(beforeText) {
+    const wm = /[A-Za-z]+$/.exec(beforeText)
+    if (wm && ABBREV.has(wm[0])) return true
+    return /(?:^|[\s("“])(?:e\.g|i\.e)$/i.test(beforeText)
+  }
   function feedStream(r) {
     if (r.suppressTts) return
     const maxLen = state.settings.maxSentenceLen || 80
     let sentAny = false
+    let scan = r.pos
     for (;;) {
-      const m = /[。！？!?；;\n]/.exec(r.raw.slice(r.pos))
+      const rest = r.raw.slice(scan)
+      SENT_RE.lastIndex = 0
+      const m = SENT_RE.exec(rest)
       if (!m) break
-      const end = r.pos + m.index + 1
+      const abs = scan + m.index
+      if (m[0] === '.' && isAbbrevBoundary(r.raw.slice(r.pos, abs))) {
+        scan = abs + 1
+        continue
+      }
+      const end = abs + m[0].length
       const seg = r.raw.slice(r.pos, end)
       r.pos = end
+      scan = r.pos
       sentAny = dispatchSentences(r, segToSentences(seg, maxLen)) || sentAny
     }
     return sentAny
