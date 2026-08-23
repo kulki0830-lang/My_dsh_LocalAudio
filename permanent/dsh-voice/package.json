@@ -1,7 +1,7 @@
 {
   "name": "dsh-voice",
   "description": "Realtime voice interaction for the dsh web GUI: comm button (mic/listening/speaking states), ASR -> current-conversation injection, streamed sentence-by-sentence TTS playback, clone-voice presets, and audiocpp :8081 server lifecycle via a resident Python bridge. Permanent counterpart of the validated dynamic plugin voice-1/pkg-10.",
-  "version": "0.2.0-p2",
+  "version": "0.3.0-p3",
   "private": true,
   "type": "module",
   "engines": {
@@ -9,7 +9,8 @@
   },
   "main": "lib/index.js",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js"
   },
   "dependencies": {
     "schemastery": "^3.18.0"
@@ -17,6 +18,12 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "external": [
+        "react"
+      ]
     }
   },
   "files": [
