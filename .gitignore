@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# 執行期產物
+runtime/ascii-refs/
+runtime/voice-settings.json
+*.log
+output/
+
+# 系統/編輯器
+.DS_Store
+Thumbs.db
