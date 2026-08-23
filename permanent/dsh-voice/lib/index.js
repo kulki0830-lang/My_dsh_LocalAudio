@@ -404,14 +404,22 @@ function apply(ctx, config) {
     return false
   }
   function segToSentences(rawSeg, maxLen) {
-    const seg = cleanForTts(rawSeg).replace(/[ \t]+/g, ' ').trim()
+    // Reassigned while chunking oversized segments; must stay mutable.
+    let seg = cleanForTts(rawSeg).replace(/[ \t]+/g, ' ').trim()
     if (!seg) return []
     const parts = []
     while (seg.length > maxLen) {
       const head = seg.slice(0, maxLen)
       let cut = -1
+      // Prefer the last soft punctuation inside the head.
       for (let i = head.length - 1; i >= Math.floor(maxLen * 0.4); i--) {
         if ('，,、：:'.indexOf(head[i]) >= 0) { cut = i + 1; break }
+      }
+      // Fall back to the last space so English words are never split in half;
+      // only an unbroken >maxLen run without any space hard-cuts.
+      if (cut <= 0) {
+        const sp = head.lastIndexOf(' ')
+        if (sp >= Math.floor(maxLen * 0.4)) cut = sp
       }
       if (cut <= 0) cut = maxLen
       parts.push(seg.slice(0, cut).trim())
